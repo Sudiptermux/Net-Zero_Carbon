@@ -1,0 +1,16 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python caching
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Large models to exclude (GitHub 100MB limit)
+models/RandomForest_final_fold.joblib

@@ -1,0 +1,18 @@
+Multi-Region, Multi-Year Grid Provenance Log
+============================================
+Generated: 2026-06-19T21:43:51
+Year Range: 2019 - 2023
+
+Grid load columns mapping:
+   East: Eastern Region Hourly Demand [REAL (Kaggle hourly-load-India)]
+   West: Western Region Hourly Demand [REAL (Kaggle hourly-load-India)]
+   South: Southern Region Hourly Demand [REAL (Kaggle hourly-load-India)]
+
+Weather Coordinates & Provenance:
+   East: (21.4669, 83.9756) [REAL (NASA POWER API)]
+   West: (26.2389, 73.0243) [REAL (NASA POWER API)]
+   South: (11.6854, 76.132) [REAL (NASA POWER API)]
+
+CEA Grid Emission Factors: Annual Variable (0.81 tCO2/MWh in 2019 down to 0.7117 in 2023), diurnally adjusted.
+Carbon prices: Ornstein-Uhlenbeck CCTS model (Rs 250 - 1500).
+Forestry Sequestration: Region-specific biomass densities calibrated using Forest Survey of India constants.
