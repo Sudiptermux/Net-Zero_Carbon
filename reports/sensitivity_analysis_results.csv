@@ -1,0 +1,8 @@
+Parameter,Baseline,Sweep_Value,Impact_Metric,Engineering_Explanation
+BESS Capacity,100 MWh,80 MWh,79.9% of Baseline CO2 Avoided (26.39 t),Reduced storage volume curtails solar buffer duration
+BESS Capacity,100 MWh,100 MWh,100.0% Baseline Mitigation (33.03 t),Optimal pairing with 30 MW inverter (0.3C rate)
+BESS Capacity,100 MWh,120 MWh,120.3% of Baseline CO2 Avoided (39.73 t),Diminishing marginal returns due to 30 MW inverter bottleneck
+Price Volatility (sigma),INR 120/t,INR 60/t (Low Volatility),"Hedged Savings: INR 21,115",Stable spot price narrows arbitrage spread between spot and trailing MA
+Price Volatility (sigma),INR 120/t,INR 120/t (Nominal),"Hedged Savings: INR 31,676",Calibrated historical CCTS market compliance spread
+Price Volatility (sigma),INR 120/t,INR 180/t (High Volatility),"Hedged Savings: INR 26,326",Frequent market shocks trigger proactive risk-hedging floor purchases
+Ambient Temperature,< 30 C,T > 35 C (Heatwave / Summer),42% Reduction in Terrestrial Sequestration,Canopy photorespiration exceeds photosynthesis; LSTM schedules early morning pre-charging

@@ -302,14 +302,88 @@ def run_shap_explainability(model, X_sample: pd.DataFrame, feature_cols, out_dir
     high_idx = X_sample[target_col].idxmax() if target_col in X_sample.columns else 0
     low_idx = X_sample[target_col].idxmin() if target_col in X_sample.columns else 1
 
+    base_val = float(explainer.expected_value) if np.isscalar(explainer.expected_value) else float(explainer.expected_value[0])
+
     for label, idx in [("high", high_idx), ("low", low_idx)]:
         row_pos = X_sample.index.get_loc(idx)
-        plt.figure()
-        shap.plots._waterfall.waterfall_legacy(
-            explainer.expected_value, shap_values[row_pos], feature_names=feature_cols, show=False
-        )
-        plt.tight_layout()
-        plt.savefig(os.path.join(out_dir, f"shap_waterfall_{label}.png"), dpi=150)
+        vals = shap_values[row_pos]
+        
+        # Sort features by absolute contribution
+        sorted_indices = np.argsort(np.abs(vals))[::-1]
+        top_k = 9
+        top_indices = sorted_indices[:top_k]
+        other_indices = sorted_indices[top_k:]
+        
+        waterfall_features = [feature_cols[i] for i in top_indices]
+        waterfall_deltas = [vals[i] for i in top_indices]
+        
+        if len(other_indices) > 0:
+            other_sum = np.sum(vals[other_indices])
+            waterfall_features.append(f"{len(other_indices)} other features")
+            waterfall_deltas.append(other_sum)
+            
+        # Reverse order for bottom-to-top plotting
+        waterfall_features = list(reversed(waterfall_features))
+        waterfall_deltas = list(reversed(waterfall_deltas))
+        n_feats = len(waterfall_deltas)
+        
+        # Compute cumulative step positions
+        running = base_val
+        bottoms = []
+        for d in waterfall_deltas:
+            if d >= 0:
+                bottoms.append(running)
+                running += d
+            else:
+                running += d
+                bottoms.append(running)
+        final_val = running
+        
+        fig, ax = plt.subplots(figsize=(6.4, 5.2), dpi=300)
+        y_pos = np.arange(n_feats)
+        bar_colors = ['#e11d48' if d >= 0 else '#0284c7' for d in waterfall_deltas]
+        
+        # Horizontal step bars
+        bars = ax.barh(y_pos, [abs(d) for d in waterfall_deltas], left=bottoms, height=0.62,
+                        color=bar_colors, edgecolor='none', alpha=0.92)
+        
+        # Vertical reference line for baseline E[f(X)]
+        ax.axvline(base_val, color='#64748b', linestyle='--', linewidth=1.2, alpha=0.8)
+        
+        # Determine span for non-overlapping text placement outside the boxes
+        all_vals = bottoms + [b + abs(d) for b, d in zip(bottoms, waterfall_deltas)] + [base_val, final_val]
+        x_min, x_max = min(all_vals), max(all_vals)
+        span = x_max - x_min
+        ax.set_xlim(x_min - span * 0.12, x_max + span * 0.15)
+        
+        # Annotate values strictly OUTSIDE each bar (never inside the box)
+        for i, (d, bottom) in enumerate(zip(waterfall_deltas, bottoms)):
+            val_str = f"+{d:,.2f}" if d >= 0 else f"{d:,.2f}"
+            text_color = '#be123c' if d >= 0 else '#0369a1'
+            if d >= 0:
+                x_text = bottom + d + span * 0.02
+                ha = 'left'
+            else:
+                x_text = bottom - span * 0.02
+                ha = 'right'
+            ax.text(x_text, y_pos[i], val_str, va='center', ha=ha, fontsize=8.5, fontweight='bold', color=text_color)
+            
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(waterfall_features, fontsize=9.0)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_color('#cbd5e1')
+        ax.spines['bottom'].set_color('#cbd5e1')
+        ax.grid(axis='x', linestyle=':', alpha=0.5)
+        
+        ax.set_xlabel('Model Output Net Carbon Balance (kgCO2/h)', fontsize=9.5, fontweight='bold', labelpad=6)
+        title_str = "High NCB (Deficit Hour)" if label == "high" else "Low NCB (Surplus Hour)"
+        ax.set_title(f"SHAP Waterfall Attribution: {title_str}\nE[f(X)] = {base_val:,.1f}  →  f(x) = {final_val:,.1f}",
+                     fontsize=10.0, fontweight='bold', pad=10)
+        
+        plt.subplots_adjust(left=0.38, right=0.92, top=0.88, bottom=0.14)
+        out_fig_path = os.path.join(out_dir, f"shap_waterfall_{label}.png")
+        plt.savefig(out_fig_path, dpi=300)
         plt.close()
 
     print(f"SHAP plots saved to {out_dir}/")

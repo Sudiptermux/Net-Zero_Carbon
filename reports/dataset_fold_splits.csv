@@ -1,0 +1,6 @@
+Fold,Train_Samples,Train_Pct,Test_Samples,Test_Pct,Zero_Leakage_Guaranteed
+Fold 1,21902,16.7,21899,16.7,True
+Fold 2,43801,33.3,21899,16.7,True
+Fold 3,65700,50.0,21899,16.7,True
+Fold 4,87599,66.7,21899,16.7,True
+Fold 5,109498,83.3,21899,16.7,True
