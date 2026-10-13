@@ -24,7 +24,10 @@ import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import shap
+try:
+    import shap
+except Exception as e:
+    shap = None
 from lightgbm import LGBMRegressor
 from scipy import stats
 from sklearn.ensemble import RandomForestRegressor

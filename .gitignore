@@ -8,9 +8,22 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# OS generated
+# OS & Editor generated
 .DS_Store
 Thumbs.db
+~$*
 
 # Large models to exclude (GitHub 100MB limit)
 models/RandomForest_final_fold.joblib
+
+# Document exclusions: ignore all docx, doc, and pdf files except the main camera-ready manuscript
+*.docx
+*.doc
+*.pdf
+!Camera_Ready_Paper_331.pdf
+
+# Report scripts
+enhance_experiments_and_figures.py
+formal_report.py
+generate_research_paper.py
+personal_report.py
